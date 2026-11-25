@@ -40,7 +40,8 @@ python3 -m http.server 8000
 npx serve .
 ```
 
-Then visit `http://localhost:8000`.
+Then visit `http://localhost:8000`. for python
+`http://localhost:3000` for Node
 
 ## Project structure
 
