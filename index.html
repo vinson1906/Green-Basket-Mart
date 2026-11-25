@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Green Basket Mart</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=DM+Sans:wght@400;500;700&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { paper: 'var(--paper)', ink: 'var(--ink)', leaf: 'var(--leaf)', tomato: 'var(--tomato)', butter: 'var(--butter)', card: 'var(--card)', line: 'var(--line)' },
+                    fontFamily: { display: ['"Bricolage Grotesque"', 'system-ui', 'sans-serif'], body: ['"DM Sans"', 'system-ui', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <style>
+        :root {
+            --paper: #fff8e8;
+            --ink: #1c2a1f;
+            --leaf: #1f6b42;
+            --tomato: #e8452c;
+            --butter: #ffd75e;
+            --card: #ffffff;
+            --line: #e9dfc6;
+            color-scheme: light;
+            box-sizing: border-box;
+            padding-top: env(safe-area-inset-top, 0px);
+            padding-bottom: env(safe-area-inset-bottom, 0px)
+        }
+
+        @media (prefers-color-scheme:dark) {
+            :root:not([data-theme="light"]) {
+                --paper: #13201a;
+                --ink: #f6efdc;
+                --leaf: #5fd08f;
+                --tomato: #ff7058;
+                --butter: #ffd75e;
+                --card: #1b2c23;
+                --line: #2c4237;
+                color-scheme: dark
+            }
+        }
+
+        :root[data-theme="dark"] {
+            --paper: #13201a;
+            --ink: #f6efdc;
+            --leaf: #5fd08f;
+            --tomato: #ff7058;
+            --butter: #ffd75e;
+            --card: #1b2c23;
+            --line: #2c4237;
+            color-scheme: dark
+        }
+
+        html {
+            scroll-padding-top: env(safe-area-inset-top, 0px)
+        }
+
+        body {
+            background: var(--paper);
+            color: var(--ink);
+            font-family: 'DM Sans', system-ui, sans-serif;
+            overflow-x: hidden
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0 0 auto;
+            height: env(safe-area-inset-top, 0px);
+            background: var(--paper);
+            z-index: 60
+        }
+
+        header {
+            top: env(safe-area-inset-top, 0px)
+        }
+
+        .chip {
+            border: 2px solid var(--ink);
+            border-radius: 999px;
+            padding: .4rem 1rem;
+            font-weight: 700;
+            transition: background .2s, color .2s, transform .2s
+        }
+
+        .chip:hover {
+            transform: translateY(-2px)
+        }
+
+        .chip.on {
+            background: var(--ink);
+            color: var(--paper)
+        }
+
+        .pcard {
+            background: var(--card);
+            border: 2px solid var(--line);
+            border-radius: 1.5rem;
+            transition: border-color .25s
+        }
+
+        .pcard:hover {
+            border-color: var(--ink)
+        }
+
+        .pcard .em {
+            display: inline-block;
+            transition: transform .35s cubic-bezier(.3, 1.6, .5, 1)
+        }
+
+        .pcard:hover .em {
+            transform: scale(1.18) rotate(-8deg)
+        }
+
+        .btn {
+            background: var(--ink);
+            color: var(--paper);
+            border-radius: 999px;
+            font-weight: 700;
+            padding: .55rem 1.1rem;
+            transition: background .2s, transform .15s
+        }
+
+        .btn:hover {
+            background: var(--leaf);
+            color: #fff
+        }
+
+        .btn:active {
+            transform: scale(.94)
+        }
+
+        :focus-visible {
+            outline: 3px solid var(--tomato);
+            outline-offset: 2px
+        }
+
+        .float {
+            position: absolute;
+            user-select: none;
+            will-change: transform
+        }
+
+        @media (prefers-reduced-motion:reduce) {
+            * {
+                transition: none !important
+            }
+        }
+    </style>
+</head>
+
+<body class="font-body">
+
+    <header
+        class="sticky z-50 flex items-center justify-between px-5 md:px-10 py-3 bg-paper/90 backdrop-blur border-b-2 border-line">
+        <a href="#top" class="font-display font-extrabold text-xl flex items-center gap-2"><span
+                class="text-2xl">🧺</span>Green Basket</a>
+        <label class="hidden md:block flex-1 max-w-md mx-8">
+            <span class="sr-only">Search products</span>
+            <input id="q" type="search" placeholder="Search mangoes, milk, rice…"
+                class="w-full rounded-full border-2 border-line bg-card px-5 py-2 outline-none focus:border-ink">
+        </label>
+        <div class="flex items-center gap-3">
+            <button id="theme" class="chip !px-3" aria-label="Toggle theme">◐</button>
+            <button id="cartBtn" class="btn flex items-center gap-2" aria-label="Open cart">
+                <span>Cart</span><span id="count"
+                    class="bg-butter text-[#1c2a1f] rounded-full min-w-6 h-6 grid place-items-center text-sm px-1">0</span>
+            </button>
+        </div>
+    </header>
+
+    <main id="top">
+        <section class="relative overflow-hidden px-5 md:px-10 pt-14 pb-24 md:pt-24 md:pb-32" id="hero">
+            <div class="float text-6xl md:text-8xl" style="top:10%;left:6%">🍅</div>
+            <div class="float text-5xl md:text-7xl" style="top:16%;right:8%">🥑</div>
+            <div class="float text-5xl md:text-7xl" style="bottom:12%;left:14%">🥕</div>
+            <div class="float text-6xl md:text-8xl" style="bottom:8%;right:12%">🍋</div>
+            <div class="float text-4xl md:text-6xl" style="top:48%;left:46%;opacity:.5">🌿</div>
+            <div class="relative max-w-4xl mx-auto text-center">
+                <p class="hero-in inline-block bg-butter text-[#1c2a1f] font-bold rounded-full px-4 py-1 mb-6">Free
+                    delivery over ₹499</p>
+                <h1 class="font-display font-extrabold leading-[.95] tracking-tight text-5xl sm:text-7xl md:text-8xl"
+                    id="title">
+                    <span class="line block overflow-hidden"><span class="inner block">Fresh from the
+                            farm,</span></span>
+                    <span class="line block overflow-hidden"><span class="inner block text-tomato">at your
+                            door</span></span>
+                    <span class="line block overflow-hidden"><span class="inner block">by tonight.</span></span>
+                </h1>
+                <p class="hero-in mt-6 text-lg max-w-xl mx-auto opacity-80">Fruit, vegetables, dairy and pantry staples,
+                    picked this morning and packed in recycled paper.</p>
+                <div class="hero-in mt-8 flex gap-3 justify-center flex-wrap">
+                    <a href="#shop" class="btn !px-7 !py-3 text-lg">Start shopping</a>
+                    <a href="#perks" class="chip text-lg">How it works</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="perks" class="px-5 md:px-10 pb-16">
+            <div class="max-w-5xl mx-auto grid sm:grid-cols-3 gap-4">
+                <div class="pcard p-6 cursor-pointer">
+                    <div class="text-4xl mb-3">🌱</div>
+                    <h3 class="font-display font-bold text-xl">Picked today</h3>
+                    <p class="opacity-75 mt-1">Harvested within 12 hours of your order.</p>
+                </div>
+                <div class="pcard p-6 cursor-pointer">
+                    <div class="text-4xl mb-3">🛵</div>
+                    <h3 class="font-display font-bold text-xl">Two-hour slots</h3>
+                    <p class="opacity-75 mt-1">Choose a window that fits your evening.</p>
+                </div>
+                <div class="pcard p-6 cursor-pointer">
+                    <div class="text-4xl mb-3">↩️</div>
+                    <h3 class="font-display font-bold text-xl">Easy refunds</h3>
+                    <p class="opacity-75 mt-1">Not fresh? Tell us and we refund the item.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="shop" class="px-5 md:px-10 pb-24 max-w-6xl mx-auto">
+            <div class="flex flex-wrap items-end justify-between gap-4 mb-8">
+                <h2 class="font-display font-extrabold text-4xl md:text-5xl">Shop the aisles</h2>
+                <div id="chips" class="flex gap-2 flex-wrap" role="tablist"></div>
+            </div>
+            <input id="q2" type="search" placeholder="Search products" aria-label="Search products"
+                class="md:hidden w-full mb-6 rounded-full border-2 border-line bg-card px-5 py-2 outline-none focus:border-ink">
+            <div id="grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"></div>
+            <p id="empty" class="hidden text-center py-16 text-lg opacity-70">No products match your search. Try a
+                different word or pick another aisle.</p>
+        </section>
+    </main>
+
+    <footer class="border-t-2 border-line px-5 md:px-10 py-8 text-center opacity-75">Green Basket Mart · Fresh
+        groceries, delivered daily</footer>
+
+    <div id="shade" class="fixed inset-0 z-[70] bg-black/50 hidden opacity-0"></div>
+    <aside id="drawer"
+        class="fixed top-0 right-0 bottom-0 z-[80] w-full max-w-md bg-paper border-l-2 border-ink flex flex-col translate-x-full"
+        aria-label="Shopping cart"
+        style="padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)">
+        <div class="flex items-center justify-between p-5 border-b-2 border-line">
+            <h2 class="font-display font-extrabold text-2xl">Your basket</h2>
+            <button id="close" class="chip !px-3" aria-label="Close cart">✕</button>
+        </div>
+        <div id="items" class="flex-1 overflow-y-auto p-5 space-y-3"></div>
+        <div class="p-5 border-t-2 border-line space-y-2">
+            <div class="flex justify-between"><span>Subtotal</span><b id="sub">₹0</b></div>
+            <div class="flex justify-between"><span>Delivery</span><b id="del">₹0</b></div>
+            <div class="flex justify-between text-xl font-display font-bold"><span>Total</span><span id="tot">₹0</span>
+            </div>
+            <button id="order" class="btn w-full !py-3 text-lg mt-2">Place order</button>
+        </div>
+    </aside>
+
+    <div id="toast"
+        class="fixed left-1/2 bottom-6 z-[90] -translate-x-1/2 bg-ink text-paper font-bold rounded-full px-5 py-3 opacity-0 pointer-events-none">
+    </div>
+
+    <script>
+        const P = [
+            { id: 1, n: 'Alphonso mangoes', e: '🥭', p: 249, u: '1 kg', c: 'Fruit' },
+            { id: 2, n: 'Robusta bananas', e: '🍌', p: 55, u: '6 pcs', c: 'Fruit' },
+            { id: 3, n: 'Red apples', e: '🍎', p: 180, u: '1 kg', c: 'Fruit' },
+            { id: 4, n: 'Green grapes', e: '🍇', p: 120, u: '500 g', c: 'Fruit' },
+            { id: 5, n: 'Vine tomatoes', e: '🍅', p: 40, u: '500 g', c: 'Vegetables' },
+            { id: 6, n: 'Carrots', e: '🥕', p: 48, u: '500 g', c: 'Vegetables' },
+            { id: 7, n: 'Broccoli', e: '🥦', p: 75, u: '1 head', c: 'Vegetables' },
+            { id: 8, n: 'Sweet corn', e: '🌽', p: 30, u: '2 cobs', c: 'Vegetables' },
+            { id: 9, n: 'Farm milk', e: '🥛', p: 34, u: '500 ml', c: 'Dairy' },
+            { id: 10, n: 'Cheddar cheese', e: '🧀', p: 145, u: '200 g', c: 'Dairy' },
+            { id: 11, n: 'Free-range eggs', e: '🥚', p: 96, u: '12 pcs', c: 'Dairy' },
+            { id: 12, n: 'Sourdough loaf', e: '🍞', p: 110, u: '400 g', c: 'Pantry' },
+            { id: 13, n: 'Basmati rice', e: '🍚', p: 210, u: '2 kg', c: 'Pantry' },
+            { id: 14, n: 'Wild honey', e: '🍯', p: 260, u: '350 g', c: 'Pantry' },
+            { id: 15, n: 'Filter coffee', e: '☕', p: 190, u: '250 g', c: 'Pantry' },
+            { id: 16, n: 'Cold-pressed oil', e: '🫒', p: 340, u: '500 ml', c: 'Pantry' }
+        ];
+        const cats = ['All', 'Fruit', 'Vegetables', 'Dairy', 'Pantry'];
+        let cat = 'All', term = '', cart = {};
+        const $ = s => document.querySelector(s), money = n => '₹' + n;
+        const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        // chips
+        $('#chips').innerHTML = cats.map(c => `<button role="tab" class="chip ${c === 'All' ? 'on' : ''}" data-c="${c}">${c}</button>`).join('');
+        $('#chips').addEventListener('click', e => {
+            const b = e.target.closest('.chip'); if (!b) return; cat = b.dataset.c;
+            document.querySelectorAll('#chips .chip').forEach(x => x.classList.toggle('on', x === b)); render(true)
+        });
+        ['#q', '#q2'].forEach(s => $(s).addEventListener('input', e => { term = e.target.value.toLowerCase(); $('#q').value = $('#q2').value = e.target.value; render(true) }));
+
+        function render(animate) {
+            const list = P.filter(p => (cat === 'All' || p.c === cat) && p.n.toLowerCase().includes(term));
+            $('#grid').innerHTML = list.map(p => `
+   <article class="pcard p-4 flex flex-col" data-id="${p.id}">
+    <div class="rounded-2xl bg-paper grid place-items-center h-28 md:h-32 mb-3 text-6xl"><span class="em">${p.e}</span></div>
+    <h3 class="font-display font-bold leading-tight">${p.n}</h3>
+    <p class="text-sm opacity-70">${p.u} · ${p.c}</p>
+    <div class="mt-auto pt-3 flex items-center justify-between">
+      <b class="text-lg">${money(p.p)}</b>
+      <button class="btn add !px-4" data-id="${p.id}" aria-label="Add ${p.n} to cart">Add</button>
+    </div></article>`).join('');
+            $('#empty').classList.toggle('hidden', list.length > 0);
+            if (animate && !reduce && list.length) gsap.from('#grid .pcard', { y: 30, opacity: 0, scale: .92, duration: .45, stagger: .04, ease: 'back.out(1.5)' });
+        }
+
+        $('#grid').addEventListener('click', e => {
+            const b = e.target.closest('.add'); if (!b) return;
+            const p = P.find(x => x.id == b.dataset.id); add(p.id);
+            fly(b.closest('.pcard').querySelector('.em'), p.e); toast(p.n + ' added to basket');
+        });
+
+        function fly(src, emoji) {
+            if (reduce) { bump(); return }
+            const a = src.getBoundingClientRect(), t = $('#cartBtn').getBoundingClientRect();
+            const el = document.createElement('div'); el.textContent = emoji;
+            Object.assign(el.style, { position: 'fixed', left: a.left + 'px', top: a.top + 'px', fontSize: '3rem', zIndex: 100, pointerEvents: 'none' });
+            document.body.appendChild(el);
+            gsap.to(el, { x: t.left - a.left + 20, y: t.top - a.top, scale: .3, rotation: 360, duration: .8, ease: 'power2.in', onComplete: () => { el.remove(); bump() } });
+        }
+        function bump() { gsap.fromTo('#cartBtn', { scale: 1.2 }, { scale: 1, duration: .5, ease: 'elastic.out(1,.4)' }) }
+        function toast(m) {
+            const t = $('#toast'); t.textContent = m; gsap.killTweensOf(t);
+            gsap.timeline().fromTo(t, { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: .3, ease: 'power3.out' }).to(t, { opacity: 0, y: 20, delay: 1.6, duration: .3 })
+        }
+
+        function add(id, d = 1) { cart[id] = (cart[id] || 0) + d; if (cart[id] <= 0) delete cart[id]; drawCart() }
+        function drawCart() {
+            const ids = Object.keys(cart); let sub = 0, n = 0;
+            $('#items').innerHTML = ids.length ? ids.map(i => {
+                const p = P.find(x => x.id == i), q = cart[i]; sub += p.p * q; n += q;
+                return `<div class="flex items-center gap-3 bg-card border-2 border-line rounded-2xl p-3 item">
+    <span class="text-4xl">${p.e}</span>
+    <div class="flex-1"><b class="font-display">${p.n}</b><div class="text-sm opacity-70">${money(p.p)} · ${p.u}</div></div>
+    <div class="flex items-center gap-2"><button class="chip !px-2.5 !py-0" data-d="-1" data-id="${i}" aria-label="Remove one">−</button><b>${q}</b><button class="chip !px-2.5 !py-0" data-d="1" data-id="${i}" aria-label="Add one">+</button></div></div>`
+            }).join('')
+                : '<div class="text-center py-16 opacity-70"><div class="text-6xl mb-3">🧺</div>Your basket is empty. Add something fresh from the aisles.</div>';
+            const del = sub === 0 || sub >= 499 ? 0 : 40;
+            $('#count').textContent = n; $('#sub').textContent = money(sub);
+            $('#del').textContent = sub >= 499 ? 'Free' : money(del); $('#tot').textContent = money(sub + del);
+        }
+        $('#items').addEventListener('click', e => { const b = e.target.closest('[data-d]'); if (b) add(b.dataset.id, +b.dataset.d) });
+
+        // drawer
+        function open() {
+            const s = $('#shade'); s.classList.remove('hidden');
+            gsap.to(s, { opacity: 1, duration: .25 }); gsap.to('#drawer', { x: 0, duration: reduce ? 0 : .5, ease: 'power4.out' });
+            if (!reduce) gsap.from('#items .item', { x: 40, opacity: 0, stagger: .06, delay: .15, duration: .4 })
+        }
+        function close() {
+            gsap.to('#drawer', { x: '100%', duration: reduce ? 0 : .4, ease: 'power3.in' });
+            gsap.to('#shade', { opacity: 0, duration: .25, onComplete: () => $('#shade').classList.add('hidden') })
+        }
+        $('#cartBtn').onclick = open; $('#close').onclick = close; $('#shade').onclick = close;
+        addEventListener('keydown', e => { if (e.key === 'Escape') close() });
+        $('#order').onclick = () => {
+            if (!Object.keys(cart).length) { toast('Add items before placing an order'); return }
+            cart = {}; drawCart(); close(); toast('Order placed. We\u2019ll deliver tonight!');
+            if (!reduce) gsap.fromTo('#count', { rotation: -20 }, { rotation: 0, duration: .6, ease: 'elastic.out(1,.3)' })
+        };
+
+        // theme
+        $('#theme').onclick = () => {
+            const d = document.documentElement, dark = getComputedStyle(d).colorScheme === 'dark';
+            d.dataset.theme = dark ? 'light' : 'dark'
+        };
+
+        // page-load hero sequence
+        render(false); drawCart();
+        if (!reduce) {
+            const tl = gsap.timeline({ defaults: { ease: 'power4.out' } });
+            tl.from('.inner', { yPercent: 110, rotate: 3, duration: 1, stagger: .15 })
+                .from('.hero-in', { y: 20, opacity: 0, duration: .6, stagger: .1 }, '-=.5')
+                .from('.float', { scale: 0, rotation: -120, opacity: 0, duration: .9, stagger: .12, ease: 'back.out(2)' }, '-=.8');
+            document.querySelectorAll('.float').forEach((f, i) =>
+                gsap.to(f, { y: i % 2 ? -18 : 18, x: i % 2 ? 10 : -10, rotation: i % 2 ? 8 : -8, duration: 2.6 + i * .3, repeat: -1, yoyo: true, ease: 'sine.inOut' }));
+            $('#hero').addEventListener('pointermove', e => {
+                const r = e.currentTarget.getBoundingClientRect(), x = (e.clientX - r.left) / r.width - .5, y = (e.clientY - r.top) / r.height - .5;
+                document.querySelectorAll('.float').forEach((f, i) => gsap.to(f, { xPercent: x * (20 + i * 8), yPercent: y * (20 + i * 8), duration: 1, overwrite: 'auto' }))
+            });
+        }
+    </script>
+</body>
+
+</html>
